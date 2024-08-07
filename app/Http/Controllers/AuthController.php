@@ -42,12 +42,22 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid Credentials'], 400);
         }
 
-        return response()->json($token);
+        return response()->json(['token' => $token], 200);
     }
 
-    public function signup(): JsonResponse
+    public function signup(Request $request): JsonResponse
     {
-        return response()->json();
+        $credentials = $request->all();
+
+        $user = User::query()->where('email', $credentials['email'])->first();
+
+        if ($user !== null) {
+            return response()->json(['message' => 'Email already exists'], 400);
+        }
+
+        User::create($credentials);
+
+        return response()->json(['message' => 'User created'], 201);
     }
 
     public function get(Request $request): JsonResponse
@@ -55,13 +65,23 @@ class AuthController extends Controller
         $token = $request->header('Authorization');
 
         if ($token === null) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Invalid token'], 400);
         }
 
-        $payload = JWTAuth::setToken($token)->getPayload();
+        try {
+            $payload = JWTAuth::setToken($token)->getPayload();
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Invalid token'], 400);
+        }
 
-        $claims = $payload->toArray();
+        $userid = $payload->get('sub');
 
-        return response()->json($claims);
+        $user = User::query()->where('id', $userid)->first();
+
+        if ($user === null) {
+            return response()->json(['message' => 'Invalid User'], 400);
+        }
+
+        return response()->json($user, 200);
     }
 }
