@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\JWT;
 
 class AuthController extends Controller
 {
@@ -17,17 +18,17 @@ class AuthController extends Controller
         $email = $request->input('email');
         $password = $request->input('password');
 
-        if (!$email) {
+        if ($email === null) {
             return response()->json(['message' => 'Email is required'], 400);
         }
 
-        if (!$password) {
+        if ($password === null) {
             return response()->json(['message' => 'Password is required'], 400);
         }
 
         $user = User::query()->where('email', $email)->first();
 
-        if (!$user) {
+        if ($user === null) {
             return response()->json(['message' => 'Invalid Email'], 400);
         }
 
@@ -49,8 +50,18 @@ class AuthController extends Controller
         return response()->json();
     }
 
-    public function get(): JsonResponse
+    public function get(Request $request): JsonResponse
     {
-        return response()->json(User::user());
+        $token = $request->header('Authorization');
+
+        if ($token === null) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $payload = JWTAuth::setToken($token)->getPayload();
+
+        $claims = $payload->toArray();
+
+        return response()->json($claims);
     }
 }

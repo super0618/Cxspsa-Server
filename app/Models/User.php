@@ -3,23 +3,22 @@
 namespace App\Models;
 
 // use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticate;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticate implements JWTSubject
 {
     protected $table = 'cxs_user';
 
-    public function getJWTIdentifier()
+    public function getJWTIdentifier(): string
     {
-        // Return the primary key of the user
-        return (string) $this->getKey();
+        return (string) $this->id;
     }
 
-    // Define the method to return an array of custom claims
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
-        // Return an empty array for default claims
-        return [];
+        return [
+            'email' => $this->email,
+        ];
     }
 }
