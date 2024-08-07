@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +14,6 @@ use App\Http\Controllers\ChatController;
 |
 */
 
-Route::get('/', [ChatController::class, 'index']);
+Route::post('/get', [AuthController::class, 'get']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/signup', [AuthController::class, 'signup']);
