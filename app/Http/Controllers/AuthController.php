@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -19,27 +18,28 @@ class AuthController extends Controller
         $password = $request->input('password');
 
         if (!$email) {
-            return response()->json(['error' => 'Email is required'], 400);
+            return response()->json(['message' => 'Email is required'], 400);
         }
 
         if (!$password) {
-            return response()->json(['error' => 'Password is required'], 400);
+            return response()->json(['message' => 'Password is required'], 400);
         }
 
         $user = User::query()->where('email', $email)->first();
 
         if (!$user) {
-            return response()->json(['error' => 'Invalid Email'], 400);
+            return response()->json(['message' => 'Invalid Email'], 400);
         }
 
-        if ($password != $user->password) {
-            return response()->json(['error' => 'Invalid Password'], 400);
+        if (!Hash::check($password, $user->password)) {
+            return response()->json(['message' => 'Invalid Password'], 400);
         }
 
-        $token = Auth::attempt([
-            'email' => $email,
-            'password' => Hash::make($password),
-        ]);
+        $token = JWTAuth::attempt($request->only('email', 'password'));
+
+        if ($token === false) {
+            return response()->json(['message' => 'Invalid Credentials'], 400);
+        }
 
         return response()->json($token);
     }

@@ -11,10 +11,11 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
-        "php-open-source-saver/jwt-auth": "^2.3",
+        "lcobucci/jwt": "^4.0",
         "pusher/pusher-php-server": "^7.2",
         "react/http": "^1.10",
-        "react/promise": "*"
+        "react/promise": "*",
+        "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
